@@ -49,7 +49,7 @@ STATES = [
 ]
 
 
-def switch_to_state(state):
+def rotate(state):
     s = STATES[state]
     check_call(['xrandr', '-o', s['rot']])
     for dev in touchscreens if disable_touchpads else (touchscreens + touchpads):
@@ -81,6 +81,7 @@ if __name__ == '__main__':
             if i == current_state:
                 continue
             if STATES[i]['check'](x, y):
-                switch_to_state(i)
+                current_state = i
+                rotate(i)
                 break
         sleep(1)
