@@ -1,4 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7                                                                                                                                       
+
+#######                                                                                                                                                        
+# Note: This is intended for the Kaby Lake HP Spectre x360. It was tested on model 13t-w000,                                                                   
+#       but should work on any tablet with the same touchscreen (name: ''ELAN0732:00 04F3:2493')                                                               
+#       If it doesn't work, check the output of 'xinput --list', and replace the touchscreen id                                                                
+#       on line 55 with yours. Similarly, with your trackpad name on line 58.                                                                                  
 
 from time import sleep
 from os import path as op
@@ -23,19 +29,12 @@ else:
     sys.exit(1)
 
 
-devices = check_output(['xinput', '--list', '--name-only']).splitlines()
+disable_touchpads = True
 
-touchscreen_names = ['touchscreen', 'wacom']
-touchscreens = [i for i in devices if any(j in i.lower() for j in touchscreen_names)]
-
-disable_touchpads = False
-
-touchpad_names = ['touchpad', 'trackpoint']
-touchpads = [i for i in devices if any(j in i.lower() for j in touchpad_names)]
 
 scale = float(read('in_accel_scale'))
 
-g = 7.0  # (m^2 / s) sensibility, gravity trigger
+g = 7.0  # (m^2 / s) sensibility, gravity trigger                                                                                                              
 
 STATES = [
     {'rot': 'normal', 'coord': '1 0 0 0 1 0 0 0 1', 'touchpad': 'enable',
@@ -52,14 +51,11 @@ STATES = [
 def rotate(state):
     s = STATES[state]
     check_call(['xrandr', '-o', s['rot']])
-    for dev in touchscreens if disable_touchpads else (touchscreens + touchpads):
-        check_call([
-            'xinput', 'set-prop', dev,
-            'Coordinate Transformation Matrix',
-        ] + s['coord'].split())
+
+    check_call(['xinput', 'set-prop', 'ELAN0732:00 04F3:2493', 'Coordinate Transformation Matrix',] + s['coord'].split())
+
     if disable_touchpads:
-        for dev in touchpads:
-            check_call(['xinput', s['touchpad'], dev])
+        check_call(['xinput', s['touchpad'], 'SynPS/2 Synaptics TouchPad'])
 
 
 def read_accel(fp):
