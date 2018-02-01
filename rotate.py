@@ -1,16 +1,25 @@
-#!/usr/bin/env python2.7                                                                                                                                       
+#!/usr/bin/env python2.7
 
-#######                                                                                                                                                        
-# Note: This is intended for the Kaby Lake HP Spectre x360. It was tested on model 13t-w000,                                                                   
-#       but should work on any tablet with the same touchscreen (name: ''ELAN0732:00 04F3:2493')                                                               
-#       If it doesn't work, check the output of 'xinput --list', and replace the touchscreen id                                                                
-#       on line 55 with yours. Similarly, with your trackpad name on line 58.                                                                                  
+#######
+# Note: This is intended for the Kaby Lake HP Spectre x360. It was tested on model 13t-w000,
+#       but should work on any tablet with the same touchscreen (name: ''ELAN0732:00 04F3:2493')
+#       If it doesn't work, check the output of 'xinput --list', and replace the touchscreen id,
+#       trackpad name, and pen (if applicable) at the top of the script with your values.
+
 
 from time import sleep
 from os import path as op
 import sys
 from subprocess import check_call, check_output
 from glob import glob
+
+
+# Your device names go here if different.
+TOUCHSCREEN = 'ELAN0732:00 04F3:2493'
+TOUCHPAD    = 'SynPS/2 Synaptics TouchPad'
+PEN         = 'ELAN0732:00 04F3:22E1 Pen Pen (0)'
+
+disable_touchpads = True
 
 
 def bdopen(fname):
@@ -29,12 +38,9 @@ else:
     sys.exit(1)
 
 
-disable_touchpads = True
-
-
 scale = float(read('in_accel_scale'))
 
-g = 7.0  # (m^2 / s) sensibility, gravity trigger                                                                                                              
+g = 7.0  # (m^2 / s) sensibility, gravity trigger
 
 STATES = [
     {'rot': 'normal', 'coord': '1 0 0 0 1 0 0 0 1', 'touchpad': 'enable',
@@ -52,10 +58,13 @@ def rotate(state):
     s = STATES[state]
     check_call(['xrandr', '-o', s['rot']])
 
-    check_call(['xinput', 'set-prop', 'ELAN0732:00 04F3:2493', 'Coordinate Transformation Matrix',] + s['coord'].split())
+    check_call(['xinput', 'set-prop', TOUCHSCREEN, 'Coordinate Transformation Matrix',] + s['coord'].split())
+    
+    if "Pen (0)" in check_output(['xinput', '--list']):
+        check_call(['xinput', 'set-prop', PEN, 'Coordinate Transformation Matrix',] + s['coord'].split())
 
     if disable_touchpads:
-        check_call(['xinput', s['touchpad'], 'SynPS/2 Synaptics TouchPad'])
+        check_call(['xinput', s['touchpad'], TOUCHPAD])
 
 
 def read_accel(fp):
