@@ -18,7 +18,9 @@ I'm aware that I could have programatically scanned and found the touchscreen na
 
 Find the names of your devices with `xinput --list`, and compare the names for your touchscreen, trackpad, and pen with the variables `TOUCHSCREEN`, `TOUCHPAD`, and `PEN` (if applicable) at the top of the script. Replace if necessary. 
 
-Run as a script (after making executable) with `./rotate.py &`, or by using python directly with `python2.7 rotate.py &`. For persistence after reboot, ensure it runs on boot, however that's done with your distribution. For Ubuntu that's usually with `/etc/rc.local`, and for Arch that's in `~/.xinit` before you exec your xorg/wm/dm.  
+Run as a script (after making executable) with `./rotate.py &`, or by using python directly with `python2.7 rotate.py &`. For persistence after reboot, ensure it runs on boot, however that's done with your distribution. <s>For Ubuntu that's usually with `/etc/rc.local`</s> for Arch that's in `~/.xinit` before you exec your xorg/wm/dm.  
+
+<b><u>Note:</u></b> Using rc.local may not actually work though. It needs to run after you already have an X session running, or the calls to xrandr, and xinput will fail. I don't have an ubuntu/debian system to test this on, but I'd suggest having it auto run somehow after your x session comes up. Probably with your WM/DE's provided system for running programs on startup.
 
 ### Troubleshooting 
 
